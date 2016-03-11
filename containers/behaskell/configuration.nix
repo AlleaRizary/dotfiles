@@ -118,9 +118,9 @@ in {
       texlive.combined.scheme-medium
       (texlive.combine {
         inherit (texlive) collection-langarabic
-      collection-langenglish
-      collection-publishers
-      collection-latex;
+                          collection-langenglish
+                          collection-publishers
+                          collection-latex;
       })
       
     ];
@@ -195,4 +195,11 @@ in {
   #reflex-platform
   nix.trustedBinaryCaches = [ "https://nixcache.reflex-frp.org" ];
   nix.binaryCachePublicKeys = [ "ryantrinkle.com-1:JJiAKaRv9mWgpVAz8dwewnZe0AzzEAzPkagE9SP5NWI=" ];
+
+
+  #filesystem for containers
+  #fileSystems."/var/lib/containers/behaskell/etc/nixos" = {
+  #  device = "/home/R/dotfiles";
+  #  options = "bind";
+  #};
 }
