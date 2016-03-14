@@ -30,6 +30,8 @@ in {
     #loader.efi.efiSysMountPoint = "/boot"; loader.gummiboot.enable = true; loader.efi.canTouchEfiVariables = true;
   };
 
+  nixpkgs.config.allowUnfree = true;
+
   networking = {
     hostName = "${myHostName}"; # Define your hostname.
     extraHosts = "127.0.0.1 ${myHostName}";
@@ -40,6 +42,11 @@ in {
     # networking.wireless.enable = true; # Enables wireless support via wpa_supplicant.
     #useDHCP = true;
     nameservers = ["8.8.8.8" "8.8.4.4" ];
+    nat = {
+      enable = true;
+      internalInterfaces = ["ve-+"];
+      externalInterface = "eth0";
+    };
     #defaultGateway = "192.168.1.1";
     #interfaces = {
     #   eth0.ip4 = [
@@ -57,43 +64,23 @@ in {
   # List packages installed in system profile. To search by name, run: $ nix-env -qaP | grep wget
   environment = {
     systemPackages = with pkgs; [
-      wget
-      gcc
-      gitAndTools.qgit
-      file
-      filezilla
-      telegram-cli
-      bash
-      libreoffice
-      gnumake
-      tree
-      w3m
-      zsh
-      xchat
-      tree
-      which
-      gitFull
       ascii
       attic
-      chromium
-      ctags
-      emacs
-      vim
-      stdmanpages
-      qemu
-      remake
-      samba
-      screen
-      python2nix
-      rpPPPoE
-      manpages
+      bash
       cabal2nix
-      wget
-      wgetpaste
+      chromium
+      cmake
+      ctags
       curl
-      unzip
-      youtube-dl
-      smartmontools
+      emacs
+      file
+      filezilla
+      gcc
+      gimp
+      gitAndTools.qgit
+      gitFull
+      gnumake
+      inkscape
       kde4.kdemultimedia
       kde4.kdeaccessibility
       kde4.kdeadmin
@@ -101,20 +88,22 @@ in {
       kde4.kdebindings
       kde4.kdegraphics
       kde4.kdelibs
-      kde4.kdemultimedia
       kde4.kdenetwork
       kde4.kdesdk
       kde4.kdeutils
       kde4.kdetoys
-      xmonad-with-packages
-      gimp
-      #texLiveFull
-      #texlive.combined.scheme-full
-      #texlive.collection-latexrecommended.pkgs
-      #texlive.collection-publishers.pkgs
-      #texlive.collection-basic.pkgs
-      #texlive.algorithms.pkgs
-      #texlive.cm-super.pkgs
+      libreoffice
+      manpages
+      pciutils
+      python2nix
+      qemu
+      remake
+      rpPPPoE
+      samba
+      screen
+      smartmontools
+      stdmanpages
+      telegram-cli
       texlive.combined.scheme-medium
       (texlive.combine {
         inherit (texlive) collection-langarabic
@@ -122,7 +111,18 @@ in {
                           collection-publishers
                           collection-latex;
       })
-      
+      tree
+      unrar
+      unzip
+      vim
+      w3m
+      wget
+      wgetpaste
+      which
+      xchat
+      xmonad-with-packages
+      youtube-dl
+      zsh
     ];
 
     shellAliases = {
@@ -156,11 +156,20 @@ in {
       # Enable Xmonad
       windowManager.xmonad.enable = true;
       windowManager.default = "xmonad";
+
+      #video driver
+      videoDrivers = [ "nvidia" ];
     };
   };
   
   security.sudo.enable = true;
 
+  hardware = {
+    pulseaudio.enable = true;
+    pulseaudio.support32Bit = true;
+    pulseaudio.package = pkgs.pulseaudioFull;
+    opengl.driSupport32Bit = true;
+  };
   
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users = {
