@@ -211,7 +211,7 @@ in {
   system.stateVersion = "15.09";
   
   boot.kernelPackages = pkgs.linuxPackages_latest;
-  boot.kernelModules = [ "e1000e" "snd-seq" "snd-rawmidi" ];
+  boot.kernelModules = [ "e1000e" ];
 
   #reflex-platform
   nix.trustedBinaryCaches = [ "https://nixcache.reflex-frp.org" ];

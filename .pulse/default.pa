@@ -1,0 +1,12 @@
+load-module module-augment-properties
+load-module module-null-sink
+load-module module-always-sink
+load-module module-udev-detect
+ 
+load-module module-device-restore
+load-module module-stream-restore
+load-module module-card-restore
+load-module module-default-device-restore
+ 
+load-module module-native-protocol-unix
+load-module module-native-protocol-tcp
