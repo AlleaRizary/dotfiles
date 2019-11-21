@@ -1,109 +1,49 @@
-;;; konfigurasi awal package
-
-(require 'package)
-(setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-			("marmalade" . "https://marmalade-repo.org/packages/")
-			("melpa" . "https://melpa.org/packages/")
-			("org" . "http://orgmode.org/elpa/")))
-
-(package-initialize)
-
-;;; setting nama dan email
+;;; init.el --- Spacemacs Initialization File
 ;;
-
-(setq user-full-name "Andika Demas Riyandi"
-      user-mail.address "andika.riyan@gmail.com")
-
-;;; install "use-package" apabila belum di install
-;;; 
-
-
-;;; kumpulan theme
+;; Copyright (c) 2012-2018 Sylvain Benner & Contributors
 ;;
-
-
-
-;;; fungsi open file as root
+;; Author: Sylvain Benner <sylvain.benner@gmail.com>
+;; URL: https://github.com/syl20bnr/spacemacs
 ;;
-
-(defadvice ido-find-file (after find-file-sudo activate)
-  "Mencari file sebagai root jika diperlukan"
-  (unless (and buffer-file-name
-	       (file-writable-p buffer-file-name))
-    (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
-
-;;; kumpulan mode yang dibutuhkan
+;; This file is not part of GNU Emacs.
 ;;
+;;; License: GPLv3
 
-(require 'nix-mode)
-(require 'haskell-mode)
-(require 'org)
-(require 'nixos-options)
-(require 'helm-mode)
-(require 'haskell-interactive-mode)
-(require 'haskell-process)
-(require 'flycheck)
+;; Without this comment emacs25 adds (package-initialize) here
+;; (package-initialize)
 
-(add-hook 'after-init-hook #'global-flycheck-mode)
-(add-hook 'haskell-mode-hook 'interactive-haskell-mode)
+;; Avoid garbage collection during startup.
+;; see `SPC h . dotspacemacs-gc-cons' for more info
+(defconst emacs-start-time (current-time))
+(setq gc-cons-threshold 402653184 gc-cons-percentage 0.6)
+(load (concat (file-name-directory load-file-name)
+              "core/core-versions.el")
+      nil (not init-file-debug))
+(load (concat (file-name-directory load-file-name)
+              "core/core-load-paths.el")
+      nil (not init-file-debug))
+(load (concat spacemacs-core-directory "core-dumper.el")
+      nil (not init-file-debug))
 
-(helm-mode 1)
-
-
-;;; kumpulan keybinding
-
-(global-set-key (kbd "C-c C-S-n") 'helm-nixos-options)
-
-
-;;; kumpulan penambahan list
-
-(with-eval-after-load 'company
-  (add-to-list 'company-backends 'company-nixos-options)
-  (add-to-list 'company-backends 'company-ghc)
-  (add-to-list 'company-backends 'company-ghci)
-  (add-to-list 'company-backends 'company-cabal))
-
-;;; flychek dengan nix
-
-(setq flycheck-command-wrapper-function
-      (lambda (command) (apply 'nix-shell-command (nix-current-sandbox) command))
-      flycheck-executable-find
-      (lambda (cmd) (nix-executable-find (nix-current-sandbox) cmd)))
-
-;;; haskell mode dengan nix
-
-(setq haskell-process-wrapper-function
-      (lambda (args) (apply 'nix-shell-command (nix-current-sandbox) args)))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ansi-color-faces-vector
-   [default default default italic underline success warning error])
- '(custom-enabled-themes (quote (solarized-dark)))
- '(custom-safe-themes
-   (quote
-    ("d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
- '(haskell-process-type (quote stack-ghci))
- '(inhibit-startup-screen t)
- '(initial-scratch-message
-   ";; Welcome Andika D. Riyandi...
-;; C-x C-f to create or find file
-;; ido-find-file to open root type file
-
-"))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
-
-
-;;; Haskell
-
-
-(autoload 'ghc-init "ghc" nil t)
-(autoload 'ghc-debug "ghc" nil t)
-(add-hook 'haskell-mode-hook (lambda() (ghc-init)))
+(if (not (version<= spacemacs-emacs-min-version emacs-version))
+    (error (concat "Your version of Emacs (%s) is too old. "
+                   "Spacemacs requires Emacs version %s or above.")
+           emacs-version spacemacs-emacs-min-version)
+  ;; Disable file-name-handlers for a speed boost during init
+  (let ((file-name-handler-alist nil))
+    (require 'core-spacemacs)
+    (spacemacs/dump-restore-load-path)
+    (configuration-layer/load-lock-file)
+    (spacemacs/init)
+    (configuration-layer/stable-elpa-init)
+    (configuration-layer/load)
+    (spacemacs-buffer/display-startup-note)
+    (spacemacs/setup-startup-hook)
+    (spacemacs/dump-eval-delayed-functions)
+    (when (and dotspacemacs-enable-server (not (spacemacs-is-dumping-p)))
+      (require 'server)
+      (when dotspacemacs-server-socket-dir
+        (setq server-socket-dir dotspacemacs-server-socket-dir))
+      (unless (server-running-p)
+        (message "Starting a server...")
+        (server-start)))))
